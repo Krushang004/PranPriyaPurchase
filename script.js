@@ -4,6 +4,8 @@ let heroRenderer, necklacesRenderer, keychainsRenderer, contactRenderer;
 let heroCamera, necklacesCamera, keychainsCamera, contactCamera;
 let isLoaded = false;
 let animationId;
+let customCursor;
+let mouseX = 0, mouseY = 0;
 
 // Performance monitoring
 const performanceMonitor = {
@@ -39,6 +41,9 @@ const performanceMonitor = {
 
 // Initialize the website
 document.addEventListener('DOMContentLoaded', function() {
+    // Setup custom cursor first
+    setupCustomCursor();
+    
     // Hide loading screen after a delay
     setTimeout(() => {
         const loadingScreen = document.getElementById('loading-screen');
@@ -50,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             initializeScenes();
             setupScrollAnimations();
-            setupInteractionEffects();
+            setupPremiumInteractions();
         } catch (error) {
             console.error('3D initialization failed:', error);
             // Fallback: hide canvases if 3D fails
@@ -58,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 canvas.style.display = 'none';
             });
         }
-    }, 2500);
+    }, 3000);
     
     // Add no-scroll class initially
     document.body.classList.add('no-scroll');
@@ -69,6 +74,60 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup performance monitoring
     setupPerformanceOptimizations();
 });
+
+// Custom Cursor System
+function setupCustomCursor() {
+    // Only setup custom cursor on desktop devices
+    if (window.innerWidth > 768 && !('ontouchstart' in window)) {
+        customCursor = document.createElement('div');
+        customCursor.classList.add('custom-cursor');
+        document.body.appendChild(customCursor);
+        
+        // Track mouse movement
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            if (customCursor) {
+                customCursor.style.left = mouseX + 'px';
+                customCursor.style.top = mouseY + 'px';
+            }
+        });
+        
+        // Handle hover states
+        const interactiveElements = document.querySelectorAll('a, button, .info-card, .instagram-post, .gallery-canvas');
+        
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                if (customCursor) {
+                    customCursor.classList.add('hover');
+                }
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                if (customCursor) {
+                    customCursor.classList.remove('hover');
+                }
+            });
+        });
+        
+        // Hide cursor when leaving window
+        document.addEventListener('mouseleave', () => {
+            if (customCursor) {
+                customCursor.style.opacity = '0';
+            }
+        });
+        
+        document.addEventListener('mouseenter', () => {
+            if (customCursor) {
+                customCursor.style.opacity = '1';
+            }
+        });
+    } else {
+        // Fallback for mobile/touch devices
+        document.body.style.cursor = 'auto';
+    }
+}
 
 // Navigation functionality
 function setupNavigation() {
@@ -217,7 +276,7 @@ if (document.readyState === 'loading') {
     preloadResources();
 }
 
-// Hero Scene with floating beads
+// Premium Hero Scene with intentional bead placement
 function initHeroScene() {
     const canvas = document.getElementById('hero-canvas');
     if (!canvas) return;
@@ -233,47 +292,167 @@ function initHeroScene() {
     
     heroRenderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
     heroRenderer.setClearColor(0x000000, 0);
+    heroRenderer.shadowMap.enabled = true;
+    heroRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
     
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // Premium lighting setup
+    const ambientLight = new THREE.AmbientLight(0xFAF6F0, 0.4);
     heroScene.add(ambientLight);
     
-    const pointLight = new THREE.PointLight(0xffffff, 0.8);
-    pointLight.position.set(10, 10, 10);
-    heroScene.add(pointLight);
+    const directionalLight = new THREE.DirectionalLight(0xE5B646, 0.8);
+    directionalLight.position.set(10, 10, 5);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    heroScene.add(directionalLight);
     
-    // Create floating beads
-    const beadGeometry = new THREE.SphereGeometry(0.3, 16, 16);
-    const colors = [0x784563, 0xE75964, 0xFA863E, 0xE5B646, 0x63AAB8];
+    const pointLight1 = new THREE.PointLight(0xE75964, 0.6);
+    pointLight1.position.set(-8, 5, 3);
+    heroScene.add(pointLight1);
     
-    for (let i = 0; i < 50; i++) {
-        const beadMaterial = new THREE.MeshPhongMaterial({ 
-            color: colors[Math.floor(Math.random() * colors.length)],
-            shininess: 100
-        });
-        
-        const bead = new THREE.Mesh(beadGeometry, beadMaterial);
-        
-        // Random position
-        bead.position.x = (Math.random() - 0.5) * 20;
-        bead.position.y = (Math.random() - 0.5) * 20;
-        bead.position.z = (Math.random() - 0.5) * 20;
-        
-        // Random rotation speed
-        bead.userData = {
-            rotationSpeed: {
-                x: (Math.random() - 0.5) * 0.02,
-                y: (Math.random() - 0.5) * 0.02,
-                z: (Math.random() - 0.5) * 0.02
-            },
-            floatSpeed: Math.random() * 0.02 + 0.01,
-            floatOffset: Math.random() * Math.PI * 2
-        };
-        
-        heroScene.add(bead);
-    }
+    const pointLight2 = new THREE.PointLight(0x63AAB8, 0.4);
+    pointLight2.position.set(8, -5, 2);
+    heroScene.add(pointLight2);
+    
+    // Create premium paper-grain beads (reduced count, intentional placement)
+    const beadConfigs = [
+        { 
+            position: { x: -6, y: 4, z: -3 }, 
+            scale: 1.8, 
+            color: 0xE5B646,
+            speed: { rotation: 0.003, float: 0.001 }
+        },
+        { 
+            position: { x: 8, y: -2, z: -5 }, 
+            scale: 2.2, 
+            color: 0xE75964,
+            speed: { rotation: 0.002, float: 0.0015 }
+        },
+        { 
+            position: { x: -3, y: -6, z: -2 }, 
+            scale: 1.6, 
+            color: 0xFA863E,
+            speed: { rotation: 0.0025, float: 0.0012 }
+        },
+        { 
+            position: { x: 5, y: 6, z: -4 }, 
+            scale: 2.0, 
+            color: 0x63AAB8,
+            speed: { rotation: 0.002, float: 0.0018 }
+        },
+        { 
+            position: { x: 0, y: 0, z: -6 }, 
+            scale: 1.4, 
+            color: 0x784563,
+            speed: { rotation: 0.0035, float: 0.001 }
+        }
+    ];
+    
+    beadConfigs.forEach((config, index) => {
+        createPremiumBead(config, index);
+    });
     
     heroCamera.position.z = 15;
+    
+    // Enhanced mouse parallax setup
+    setupHeroParallax();
+}
+
+// Create premium paper-grain textured bead
+function createPremiumBead(config, index) {
+    const beadGeometry = new THREE.SphereGeometry(config.scale, 32, 32);
+    
+    // Paper-grain texture creation
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    
+    // Base color
+    const color = new THREE.Color(config.color);
+    ctx.fillStyle = `rgb(${Math.floor(color.r * 255)}, ${Math.floor(color.g * 255)}, ${Math.floor(color.b * 255)})`;
+    ctx.fillRect(0, 0, 256, 256);
+    
+    // Paper grain effect
+    for (let i = 0; i < 3000; i++) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.3})`;
+        ctx.fillRect(Math.random() * 256, Math.random() * 256, 1, 1);
+    }
+    
+    for (let i = 0; i < 1000; i++) {
+        ctx.fillStyle = `rgba(0, 0, 0, ${Math.random() * 0.2})`;
+        ctx.fillRect(Math.random() * 256, Math.random() * 256, 1, 1);
+    }
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    
+    const beadMaterial = new THREE.MeshPhongMaterial({ 
+        map: texture,
+        shininess: 30,
+        specular: 0x333333,
+        transparent: true,
+        opacity: 0.9
+    });
+    
+    const bead = new THREE.Mesh(beadGeometry, beadMaterial);
+    bead.position.copy(config.position);
+    bead.castShadow = true;
+    bead.receiveShadow = true;
+    
+    // Animation data
+    bead.userData = {
+        rotationSpeed: config.speed.rotation,
+        floatSpeed: config.speed.float,
+        floatOffset: index * 1.2,
+        originalPosition: config.position.clone(),
+        parallaxIntensity: 0.3 + Math.random() * 0.4,
+        scale: config.scale
+    };
+    
+    heroScene.add(bead);
+}
+
+// Enhanced hero parallax with cursor interaction
+function setupHeroParallax() {
+    let targetMouseX = 0, targetMouseY = 0;
+    let currentMouseX = 0, currentMouseY = 0;
+    
+    document.addEventListener('mousemove', (event) => {
+        if (window.innerWidth > 768) {
+            targetMouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            targetMouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+    });
+    
+    // Smooth mouse interpolation and bead parallax
+    function updateHeroParallax() {
+        currentMouseX += (targetMouseX - currentMouseX) * 0.05;
+        currentMouseY += (targetMouseY - currentMouseY) * 0.05;
+        
+        // Update camera position with subtle movement
+        if (heroCamera) {
+            heroCamera.position.x += (currentMouseX * 2 - heroCamera.position.x) * 0.05;
+            heroCamera.position.y += (currentMouseY * 1.5 - heroCamera.position.y) * 0.05;
+            heroCamera.lookAt(0, 0, 0);
+        }
+        
+        // Update bead positions based on mouse
+        if (heroScene) {
+            heroScene.children.forEach(child => {
+                if (child.userData && child.userData.parallaxIntensity) {
+                    const parallaxX = currentMouseX * child.userData.parallaxIntensity;
+                    const parallaxY = currentMouseY * child.userData.parallaxIntensity;
+                    
+                    child.position.x = child.userData.originalPosition.x + parallaxX;
+                    child.position.y = child.userData.originalPosition.y + parallaxY;
+                }
+            });
+        }
+        
+        requestAnimationFrame(updateHeroParallax);
+    }
+    
+    updateHeroParallax();
 }
 
 // Necklaces Scene with interactive 3D product gallery
@@ -1284,147 +1463,298 @@ window.addEventListener('resize', () => {
     }
 });
 
-// Enhanced interaction effects
-function setupInteractionEffects() {
-    let mouseX = 0, mouseY = 0;
-    let targetMouseX = 0, targetMouseY = 0;
-    
-    // Smooth mouse following
-    document.addEventListener('mousemove', (event) => {
-        targetMouseX = (event.clientX / window.innerWidth) * 2 - 1;
-        targetMouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+// Premium interaction effects
+function setupPremiumInteractions() {
+    // Enhanced hover effects for Instagram posts
+    document.querySelectorAll('.instagram-post').forEach(post => {
+        post.addEventListener('mouseenter', () => {
+            gsap.to(post, {
+                scale: 1.05,
+                rotationY: 5,
+                duration: 0.6,
+                ease: "power2.out"
+            });
+        });
+        
+        post.addEventListener('mouseleave', () => {
+            gsap.to(post, {
+                scale: 1,
+                rotationY: 0,
+                duration: 0.6,
+                ease: "power2.out"
+            });
+        });
     });
     
-    // Smooth interpolation of mouse movement
-    function updateMouseInteraction() {
-        mouseX += (targetMouseX - mouseX) * 0.05;
-        mouseY += (targetMouseY - mouseY) * 0.05;
-        
-        // Enhanced hero camera movement with depth
-        if (heroCamera) {
-            heroCamera.position.x += (mouseX * 3 - heroCamera.position.x) * 0.05;
-            heroCamera.position.y += (mouseY * 2 - heroCamera.position.y) * 0.05;
-            heroCamera.lookAt(0, 0, 0);
-        }
-        
-        requestAnimationFrame(updateMouseInteraction);
-    }
-    updateMouseInteraction();
-    
-    // Enhanced button hover effects
+    // Enhanced button interactions
     document.querySelectorAll('.btn').forEach(btn => {
         btn.addEventListener('mouseenter', () => {
             gsap.to(btn, {
-                scale: 1.05,
-                boxShadow: '0 20px 60px rgba(120, 69, 99, 0.3)',
+                scale: 1.02,
                 duration: 0.3,
-                ease: 'power2.out'
+                ease: "power2.out"
             });
         });
         
         btn.addEventListener('mouseleave', () => {
             gsap.to(btn, {
                 scale: 1,
-                boxShadow: '0 8px 32px rgba(120, 69, 99, 0.2)',
                 duration: 0.3,
-                ease: 'power2.out'
+                ease: "power2.out"
             });
-        });
-        
-        // Add click ripple effect
-        btn.addEventListener('click', (e) => {
-            const ripple = document.createElement('span');
-            ripple.classList.add('ripple');
-            
-            const rect = btn.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-            ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-            
-            btn.appendChild(ripple);
-            
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
         });
     });
     
-    // Enhanced info card interactions
-    document.querySelectorAll('.info-card').forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            gsap.to(card, {
-                scale: 1.02,
-                rotationY: 5,
-                boxShadow: '0 20px 60px rgba(120, 69, 99, 0.2)',
+    // Process steps animation on hover
+    document.querySelectorAll('.process-step').forEach(step => {
+        step.addEventListener('mouseenter', () => {
+            const icon = step.querySelector('.step-icon');
+            gsap.to(icon, {
+                scale: 1.1,
+                rotationY: 10,
                 duration: 0.4,
-                ease: 'power2.out'
+                ease: "back.out(1.7)"
             });
         });
         
-        card.addEventListener('mouseleave', () => {
-            gsap.to(card, {
+        step.addEventListener('mouseleave', () => {
+            const icon = step.querySelector('.step-icon');
+            gsap.to(icon, {
                 scale: 1,
                 rotationY: 0,
-                boxShadow: '0 8px 32px rgba(120, 69, 99, 0.08)',
                 duration: 0.4,
-                ease: 'power2.out'
+                ease: "power2.out"
             });
         });
     });
     
-    // Gallery canvas interaction enhancements
-    const necklacesCanvas = document.getElementById('necklaces-canvas');
-    const keychainsCanvas = document.getElementById('keychains-canvas');
+    // Gallery canvas hover effects
+    document.querySelectorAll('.gallery-canvas').forEach(canvas => {
+        canvas.addEventListener('mouseenter', () => {
+            gsap.to(canvas, {
+                scale: 1.02,
+                rotationY: 2,
+                duration: 0.6,
+                ease: "power2.out"
+            });
+        });
+        
+        canvas.addEventListener('mouseleave', () => {
+            gsap.to(canvas, {
+                scale: 1,
+                rotationY: 0,
+                duration: 0.6,
+                ease: "power2.out"
+            });
+        });
+    });
+}
+
+// Enhanced scroll animations with premium easing
+function setupScrollAnimations() {
+    gsap.registerPlugin(ScrollTrigger);
     
-    [necklacesCanvas, keychainsCanvas].forEach(canvas => {
-        if (canvas) {
-            canvas.addEventListener('mouseenter', () => {
-                gsap.to(canvas, {
-                    scale: 1.02,
-                    duration: 0.5,
-                    ease: 'power2.out'
-                });
-            });
-            
-            canvas.addEventListener('mouseleave', () => {
-                gsap.to(canvas, {
-                    scale: 1,
-                    duration: 0.5,
-                    ease: 'power2.out'
-                });
-            });
+    // Smooth section reveals with staggered effects
+    gsap.utils.toArray('.section-title').forEach((title, index) => {
+        gsap.fromTo(title, 
+            { 
+                opacity: 0, 
+                y: 100, 
+                scale: 0.8,
+                rotationX: 15
+            },
+            { 
+                opacity: 1, 
+                y: 0, 
+                scale: 1,
+                rotationX: 0,
+                duration: 1.2,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: title,
+                    start: 'top 85%',
+                    end: 'bottom 20%',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
+    });
+    
+    // Subtitle animations
+    gsap.utils.toArray('.section-subtitle').forEach(subtitle => {
+        gsap.fromTo(subtitle,
+            { opacity: 0, y: 50 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                delay: 0.3,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: subtitle,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
+    });
+    
+    // Instagram grid staggered animation
+    gsap.utils.toArray('.instagram-post').forEach((post, index) => {
+        gsap.fromTo(post,
+            { 
+                opacity: 0, 
+                scale: 0.8, 
+                y: 60,
+                rotationY: 15
+            },
+            {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                rotationY: 0,
+                duration: 0.8,
+                delay: index * 0.1,
+                ease: "back.out(1.7)",
+                scrollTrigger: {
+                    trigger: '.instagram-grid',
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
+    });
+    
+    // Info cards premium animation
+    gsap.utils.toArray('.info-card').forEach((card, index) => {
+        gsap.fromTo(card,
+            { 
+                opacity: 0, 
+                x: 120, 
+                rotationY: 15,
+                scale: 0.9
+            },
+            {
+                opacity: 1,
+                x: 0,
+                rotationY: 0,
+                scale: 1,
+                duration: 1,
+                delay: index * 0.15,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
+    });
+    
+    // Process steps animation
+    gsap.utils.toArray('.process-step').forEach((step, index) => {
+        gsap.fromTo(step,
+            { 
+                opacity: 0, 
+                y: 80,
+                scale: 0.8
+            },
+            {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.8,
+                delay: index * 0.2,
+                ease: "back.out(1.7)",
+                scrollTrigger: {
+                    trigger: '.process-steps',
+                    start: 'top 75%',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
+    });
+    
+    // Gallery canvas reveal
+    gsap.utils.toArray('.gallery-canvas').forEach(canvas => {
+        gsap.fromTo(canvas,
+            { 
+                opacity: 0, 
+                scale: 0.85, 
+                rotationY: -15 
+            },
+            {
+                opacity: 1,
+                scale: 1,
+                rotationY: 0,
+                duration: 1.2,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: canvas,
+                    start: 'top 70%',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
+    });
+    
+    // Hero parallax on scroll
+    gsap.to('.hero-content', {
+        yPercent: -20,
+        ease: 'none',
+        scrollTrigger: {
+            trigger: '.hero',
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1
         }
     });
     
-    // Touch interactions for mobile
-    if ('ontouchstart' in window) {
-        document.querySelectorAll('.btn, .info-card').forEach(element => {
-            element.addEventListener('touchstart', () => {
-                element.style.transform = 'scale(0.98)';
-            });
-            
-            element.addEventListener('touchend', () => {
-                element.style.transform = '';
-            });
-        });
-    }
-    
-    // Intersection Observer for performance
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            const canvas = entry.target;
-            if (entry.isIntersecting) {
-                canvas.style.visibility = 'visible';
-            } else {
-                // Pause canvas rendering when not visible
-                canvas.style.visibility = 'hidden';
-            }
-        });
+    // Navigation blur enhancement
+    ScrollTrigger.create({
+        start: 'top -80',
+        end: 99999,
+        onEnter: () => {
+            document.querySelector('.nav').classList.add('scrolled');
+        },
+        onLeaveBack: () => {
+            document.querySelector('.nav').classList.remove('scrolled');
+        }
     });
     
-    document.querySelectorAll('canvas').forEach(canvas => {
-        observer.observe(canvas);
+    // Section background color transitions
+    ScrollTrigger.create({
+        trigger: '.custom-order-section',
+        start: 'top 80%',
+        end: 'bottom 20%',
+        onEnter: () => {
+            gsap.to('body', { 
+                backgroundColor: '#784563', 
+                duration: 1,
+                ease: "power2.out"
+            });
+        },
+        onLeave: () => {
+            gsap.to('body', { 
+                backgroundColor: '#FAF6F0', 
+                duration: 1,
+                ease: "power2.out"
+            });
+        },
+        onEnterBack: () => {
+            gsap.to('body', { 
+                backgroundColor: '#784563', 
+                duration: 1,
+                ease: "power2.out"
+            });
+        },
+        onLeaveBack: () => {
+            gsap.to('body', { 
+                backgroundColor: '#FAF6F0', 
+                duration: 1,
+                ease: "power2.out"
+            });
+        }
     });
 }
 
