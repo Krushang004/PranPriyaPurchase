@@ -578,6 +578,10 @@ body {
     background: linear-gradient(135deg, var(--color-ivory) 0%, rgba(250, 246, 240, 0.5) 100%);
 }
 
+.alt-section {
+    background: linear-gradient(135deg, rgba(229, 182, 70, 0.03) 0%, var(--color-ivory) 100%);
+}
+
 .section-header {
     text-align: center;
     margin-bottom: 80px;
@@ -602,85 +606,95 @@ body {
     letter-spacing: 0.25px;
 }
 
-.gallery-container {
+/* Premium Product Grid */
+.products-grid {
     display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 80px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 40px;
     max-width: var(--content-width);
     margin: 0 auto;
-    padding: var(--container-padding);
-    align-items: center;
 }
 
-.gallery-canvas {
-    width: 100%;
-    height: 500px;
-    border-radius: 24px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(120, 69, 99, 0.12);
-    transition: var(--transition-elegant);
-    cursor: pointer;
-}
-
-.gallery-canvas:hover {
-    transform: translateY(-12px) scale(1.02);
-    box-shadow: 0 30px 80px rgba(120, 69, 99, 0.18);
-}
-
-.gallery-info {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-}
-
-.info-card {
-    padding: 40px;
+.product-card {
     background: var(--color-white);
     border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(120, 69, 99, 0.06);
-    transition: var(--transition-elegant);
-    border-left: 4px solid var(--color-gold);
-    position: relative;
     overflow: hidden;
+    transition: var(--transition-elegant);
+    box-shadow: 0 8px 32px rgba(120, 69, 99, 0.08);
     cursor: pointer;
 }
 
-.info-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
+.product-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(120, 69, 99, 0.15);
+}
+
+.product-image-wrapper {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--color-gray-light);
+}
+
+.product-image {
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(229, 182, 70, 0.05), transparent);
+    object-fit: cover;
     transition: var(--transition-elegant);
 }
 
-.info-card:hover::before {
-    left: 100%;
+.product-card:hover .product-image {
+    transform: scale(1.08);
 }
 
-.info-card:hover {
-    transform: translateX(8px);
-    box-shadow: 0 16px 48px rgba(120, 69, 99, 0.12);
-    border-left-color: var(--color-coral);
+.product-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(120, 69, 99, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: var(--transition-elegant);
 }
 
-.info-card h3 {
+.product-card:hover .product-overlay {
+    opacity: 1;
+}
+
+.product-overlay .btn {
+    transform: translateY(20px);
+    transition: var(--transition-elegant);
+}
+
+.product-card:hover .product-overlay .btn {
+    transform: translateY(0);
+}
+
+.product-info {
+    padding: 24px;
+    text-align: center;
+}
+
+.product-name {
     font-family: var(--font-serif);
-    font-size: 24px;
-    color: var(--color-plum);
-    margin-bottom: 12px;
+    font-size: 22px;
     font-weight: 500;
+    color: var(--color-plum);
+    margin-bottom: 8px;
     letter-spacing: -0.25px;
 }
 
-.info-card p {
-    color: var(--color-plum);
+.product-description {
     font-family: var(--font-sans);
-    font-size: 16px;
-    line-height: 1.6;
-    opacity: 0.8;
+    font-size: 15px;
+    color: var(--color-plum);
+    opacity: 0.7;
+    line-height: 1.5;
 }
 
 /* Custom Order Process Section */
@@ -1433,20 +1447,22 @@ body {
         gap: 16px;
     }
     
-    /* Mobile gallery layout */
-    .gallery-container {
-        grid-template-columns: 1fr;
-        gap: 48px;
-        text-align: center;
+    /* Mobile product grid */
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
     }
     
-    .gallery-canvas {
-        height: 350px;
-        order: -1;
+    .product-info {
+        padding: 16px;
     }
     
-    .gallery-info {
-        text-align: left;
+    .product-name {
+        font-size: 18px;
+    }
+    
+    .product-description {
+        font-size: 14px;
     }
     
     /* Mobile process steps */
@@ -1519,17 +1535,9 @@ body {
         gap: 16px;
     }
     
-    .gallery-canvas {
-        height: 280px;
-        border-radius: 16px;
-    }
-    
-    .info-card {
-        padding: 24px;
-    }
-    
-    .info-card h3 {
-        font-size: 20px;
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
     }
     
     .process-step {

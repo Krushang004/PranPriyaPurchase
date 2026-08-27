@@ -1,7 +1,7 @@
 // Global variables
-let heroScene, necklacesScene, keychainsScene, contactScene;
-let heroRenderer, necklacesRenderer, keychainsRenderer, contactRenderer;
-let heroCamera, necklacesCamera, keychainsCamera, contactCamera;
+let heroScene, contactScene;
+let heroRenderer, contactRenderer;
+let heroCamera, contactCamera;
 let isLoaded = false;
 let animationId;
 let customCursor;
@@ -31,7 +31,7 @@ const performanceMonitor = {
         const isLowFPS = this.fps < 30;
         
         // Adjust renderer settings based on performance
-        [heroRenderer, necklacesRenderer, keychainsRenderer, contactRenderer].forEach(renderer => {
+        [heroRenderer, contactRenderer].forEach(renderer => {
             if (renderer) {
                 renderer.setPixelRatio(isLowFPS ? Math.min(window.devicePixelRatio, 1.5) : window.devicePixelRatio);
             }
@@ -201,8 +201,6 @@ function initializeScenes() {
     
     try {
         initHeroScene();
-        initNecklacesScene();
-        initKeychainsScene();
         initContactScene();
         
         // Start animation loop
@@ -1097,9 +1095,9 @@ function animate() {
     if (heroScene && heroRenderer && heroCamera) {
         heroScene.children.forEach((child, index) => {
             if (child.userData && child.userData.rotationSpeed) {
-                child.rotation.x += child.userData.rotationSpeed.x;
-                child.rotation.y += child.userData.rotationSpeed.y;
-                child.rotation.z += child.userData.rotationSpeed.z;
+                child.rotation.x += child.userData.rotationSpeed;
+                child.rotation.y += child.userData.rotationSpeed * 1.5;
+                child.rotation.z += child.userData.rotationSpeed * 0.5;
                 
                 // Enhanced floating animation with wave motion
                 const wave1 = Math.sin(currentTime * child.userData.floatSpeed + child.userData.floatOffset) * 0.5;
@@ -1112,73 +1110,6 @@ function animate() {
             }
         });
         heroRenderer.render(heroScene, heroCamera);
-    }
-    
-    // Animate necklaces scene with enhanced effects
-    if (necklacesScene && necklacesRenderer && necklacesCamera) {
-        necklacesScene.children.forEach(child => {
-            if (child.userData && child.userData.rotationSpeed) {
-                child.rotation.y += child.userData.rotationSpeed;
-                
-                // Enhanced necklace floating animation with pendulum swing
-                if (child.userData.originalY !== undefined) {
-                    const float = Math.sin(currentTime * child.userData.floatSpeed + child.userData.floatOffset) * 0.3;
-                    const swing = Math.sin(currentTime * 0.8 + child.userData.floatOffset) * 0.1;
-                    child.position.y = child.userData.originalY + float;
-                    child.rotation.z = swing;
-                }
-            }
-            
-            // Animate particles with organic motion
-            if (child.isPoints && child.userData.rotationSpeed) {
-                child.rotation.y += child.userData.rotationSpeed;
-                child.rotation.x += child.userData.rotationSpeed * 0.5;
-                
-                // Update particle positions for organic movement
-                const positions = child.geometry.attributes.position.array;
-                for (let i = 0; i < positions.length; i += 3) {
-                    positions[i + 1] += Math.sin(currentTime * 2 + i * 0.01) * 0.002;
-                }
-                child.geometry.attributes.position.needsUpdate = true;
-            }
-        });
-        necklacesRenderer.render(necklacesScene, necklacesCamera);
-    }
-    
-    // Animate keychains scene with enhanced physics
-    if (keychainsScene && keychainsRenderer && keychainsCamera) {
-        keychainsScene.children.forEach(child => {
-            if (child.userData && child.userData.rotationSpeed) {
-                child.rotation.y += child.userData.rotationSpeed;
-                
-                // Enhanced keychain physics simulation
-                if (child.userData.swingAmplitude) {
-                    const gravity = Math.sin(currentTime * child.userData.floatSpeed + child.userData.floatOffset);
-                    const dampening = 0.98; // Slight dampening for realism
-                    
-                    child.position.y = child.userData.originalY + gravity * child.userData.swingAmplitude;
-                    child.rotation.z = gravity * 0.2; // Natural swinging motion
-                    child.rotation.x = Math.sin(currentTime * 0.3 + child.userData.floatOffset) * 0.1;
-                    
-                    // Add slight bounce to the keychain ring
-                    const bounce = Math.abs(Math.sin(currentTime * 2 + child.userData.floatOffset)) * 0.02;
-                    child.scale.y = 1 + bounce;
-                }
-            }
-            
-            // Animate sparkles with twinkling effect
-            if (child.isPoints && child.userData.twinkleSpeed) {
-                child.rotation.y += child.userData.rotationSpeed;
-                
-                const twinkle = Math.sin(currentTime * child.userData.twinkleSpeed) * 0.5 + 0.5;
-                child.material.opacity = 0.3 + twinkle * 0.7;
-                
-                // Scale sparkles for pulsing effect
-                const pulse = 1 + Math.sin(currentTime * 3) * 0.2;
-                child.material.size = 0.08 * pulse;
-            }
-        });
-        keychainsRenderer.render(keychainsScene, keychainsCamera);
     }
     
     // Animate contact scene with fluid particle motion
@@ -1236,7 +1167,7 @@ function setupPerformanceOptimizations() {
     // Memory cleanup on page unload
     window.addEventListener('beforeunload', () => {
         // Dispose of Three.js resources
-        [heroScene, necklacesScene, keychainsScene, contactScene].forEach(scene => {
+        [heroScene, contactScene].forEach(scene => {
             if (scene) {
                 scene.traverse(child => {
                     if (child.geometry) child.geometry.dispose();
@@ -1251,7 +1182,7 @@ function setupPerformanceOptimizations() {
             }
         });
         
-        [heroRenderer, necklacesRenderer, keychainsRenderer, contactRenderer].forEach(renderer => {
+        [heroRenderer, contactRenderer].forEach(renderer => {
             if (renderer) {
                 renderer.dispose();
             }
@@ -1528,22 +1459,22 @@ function setupPremiumInteractions() {
         });
     });
     
-    // Gallery canvas hover effects
-    document.querySelectorAll('.gallery-canvas').forEach(canvas => {
-        canvas.addEventListener('mouseenter', () => {
-            gsap.to(canvas, {
+    // Enhanced hover effects for product cards
+    document.querySelectorAll('.product-card').forEach((card, index) => {
+        card.addEventListener('mouseenter', () => {
+            gsap.to(card, {
                 scale: 1.02,
-                rotationY: 2,
-                duration: 0.6,
+                rotationY: 3,
+                duration: 0.4,
                 ease: "power2.out"
             });
         });
         
-        canvas.addEventListener('mouseleave', () => {
-            gsap.to(canvas, {
+        card.addEventListener('mouseleave', () => {
+            gsap.to(card, {
                 scale: 1,
                 rotationY: 0,
-                duration: 0.6,
+                duration: 0.4,
                 ease: "power2.out"
             });
         });
@@ -1675,23 +1606,43 @@ function setupScrollAnimations() {
         );
     });
     
-    // Gallery canvas reveal
-    gsap.utils.toArray('.gallery-canvas').forEach(canvas => {
-        gsap.fromTo(canvas,
+    // Product cards premium animation
+    gsap.utils.toArray('.product-card').forEach((card, index) => {
+        gsap.fromTo(card,
             { 
                 opacity: 0, 
                 scale: 0.85, 
-                rotationY: -15 
+                y: 80,
+                rotationY: 15
             },
             {
                 opacity: 1,
                 scale: 1,
+                y: 0,
                 rotationY: 0,
-                duration: 1.2,
-                ease: "power3.out",
+                duration: 0.8,
+                delay: (index % 4) * 0.1, // Stagger by row
+                ease: "back.out(1.7)",
                 scrollTrigger: {
-                    trigger: canvas,
-                    start: 'top 70%',
+                    trigger: card,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
+    });
+    
+    // Product image zoom on scroll
+    gsap.utils.toArray('.product-image').forEach(image => {
+        gsap.fromTo(image,
+            { scale: 1.2 },
+            {
+                scale: 1,
+                duration: 1.2,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: image,
+                    start: 'top 90%',
                     toggleActions: 'play none none reverse'
                 }
             }
@@ -1762,8 +1713,6 @@ function setupScrollAnimations() {
 function handleResize() {
     const canvasConfigs = [
         { renderer: heroRenderer, camera: heroCamera, canvas: document.getElementById('hero-canvas') },
-        { renderer: necklacesRenderer, camera: necklacesCamera, canvas: document.getElementById('necklaces-canvas') },
-        { renderer: keychainsRenderer, camera: keychainsCamera, canvas: document.getElementById('keychains-canvas') },
         { renderer: contactRenderer, camera: contactCamera, canvas: document.getElementById('contact-canvas') }
     ];
     
