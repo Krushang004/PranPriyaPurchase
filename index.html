@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PranPriyaPurchase - Handmade Jewelry with Love</title>
+    <meta name="description" content="Discover beautiful handmade paper bead necklaces and keychains crafted with love. Unique designs, vibrant colors, and sustainable materials.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loader">
+            <div class="bead bead-1"></div>
+            <div class="bead bead-2"></div>
+            <div class="bead bead-3"></div>
+            <div class="bead bead-4"></div>
+            <div class="bead bead-5"></div>
+        </div>
+        <p class="loading-text">Crafting your experience...</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <h1 class="logo">PranPriyaPurchase</h1>
+            <div class="nav-links">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#necklaces" class="nav-link">Necklaces</a>
+                <a href="#keychains" class="nav-link">Keychains</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="title-main">Handcrafted</span>
+                    <span class="title-sub">with Love</span>
+                </h1>
+                <p class="hero-description">
+                    Beautiful paper bead jewelry and keychains, each piece uniquely designed to bring joy, color, and lasting memories to your collection.
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="scrollToSection('necklaces')">
+                        ✦ Explore Collection
+                    </button>
+                    <button class="btn btn-secondary" onclick="scrollToSection('contact')">
+                        💌 Order Custom
+                    </button>
+                </div>
+            </div>
+        </div>
+        <canvas id="hero-canvas" class="hero-canvas"></canvas>
+        <div class="hero-overlay"></div>
+    </section>
+
+    <!-- Necklaces Section -->
+    <section id="necklaces" class="gallery-section">
+        <div class="section-header">
+            <h2 class="section-title">Paper Bead Necklaces</h2>
+            <p class="section-subtitle">Vibrant colors, intricate patterns, sustainable beauty</p>
+        </div>
+        <div class="gallery-container">
+            <canvas id="necklaces-canvas" class="gallery-canvas"></canvas>
+            <div class="gallery-info">
+                <div class="info-card">
+                    <h3>Eco-Friendly Materials</h3>
+                    <p>Made from recycled paper and natural materials</p>
+                </div>
+                <div class="info-card">
+                    <h3>Unique Designs</h3>
+                    <p>Each piece is one-of-a-kind, crafted by hand</p>
+                </div>
+                <div class="info-card">
+                    <h3>Custom Orders</h3>
+                    <p>Personalize colors and patterns to your style</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Keychains Section -->
+    <section id="keychains" class="gallery-section alt-section">
+        <div class="section-header">
+            <h2 class="section-title">Beaded Keychains</h2>
+            <p class="section-subtitle">Functional art for your everyday carry</p>
+        </div>
+        <div class="gallery-container">
+            <canvas id="keychains-canvas" class="gallery-canvas"></canvas>
+            <div class="gallery-info">
+                <div class="info-card">
+                    <h3>Durable & Beautiful</h3>
+                    <p>Strong construction meets artistic design</p>
+                </div>
+                <div class="info-card">
+                    <h3>Perfect Gifts</h3>
+                    <p>Thoughtful presents for any occasion</p>
+                </div>
+                <div class="info-card">
+                    <h3>Mix & Match</h3>
+                    <p>Coordinate with our necklace collections</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="contact-content">
+            <div class="contact-text">
+                <h2 class="contact-title">Let's Create Together</h2>
+                <p class="contact-description">
+                    Ready to add some handmade magic to your jewelry collection? 
+                    Reach out for custom orders or questions about our pieces.
+                </p>
+                <div class="contact-buttons">
+                    <a href="https://www.instagram.com/pranpriyapurchase" target="_blank" class="btn btn-primary">
+                        📸 Visit Instagram
+                    </a>
+                    <a href="https://wa.me/+919876543210?text=Hello! I'm interested in your handmade jewelry collection." class="btn btn-secondary">
+                        💬 WhatsApp Order
+                    </a>
+                    <button class="btn btn-secondary" onclick="scrollToSection('home')">
+                        ✦ Back to Top
+                    </button>
+                </div>
+            </div>
+        </div>
+        <canvas id="contact-canvas" class="contact-canvas"></canvas>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 PranPriyaPurchase. Handcrafted with love.</p>
+            <div class="footer-links">
+                <a href="https://www.instagram.com/pranpriyapurchase" target="_blank">Instagram</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
