@@ -192,6 +192,12 @@ function scrollToSection(sectionId) {
 
 // Initialize all 3D scenes with error handling
 function initializeScenes() {
+    // Check if Three.js is loaded
+    if (typeof THREE === 'undefined') {
+        console.warn('Three.js library not loaded');
+        return;
+    }
+    
     // Check for WebGL support
     if (!isWebGLSupported()) {
         console.warn('WebGL not supported, falling back to static content');
@@ -202,6 +208,13 @@ function initializeScenes() {
     try {
         initHeroScene();
         initContactScene();
+        
+        // Verify scenes were created
+        if (!heroScene || !contactScene) {
+            console.warn('Scene initialization incomplete');
+            setupFallbackExperience();
+            return;
+        }
         
         // Start animation loop
         animate();
@@ -215,8 +228,8 @@ function initializeScenes() {
 function isWebGLSupported() {
     try {
         const canvas = document.createElement('canvas');
-        return !!(window.WebGLRenderingContext && 
-                 (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        return !!(window.WebGLRenderingContext && gl);
     } catch (e) {
         return false;
     }
@@ -224,21 +237,20 @@ function isWebGLSupported() {
 
 // Fallback experience for unsupported browsers
 function setupFallbackExperience() {
-    const canvases = document.querySelectorAll('canvas');
-    canvases.forEach(canvas => {
-        const fallback = document.createElement('div');
-        fallback.className = 'canvas-error';
-        fallback.innerHTML = `
-            <div>
-                <h3>✨ Interactive 3D Experience</h3>
-                <p>Your browser doesn't support 3D graphics, but you can still enjoy our beautiful jewelry collection!</p>
-            </div>
-        `;
-        fallback.style.width = canvas.offsetWidth + 'px';
-        fallback.style.height = canvas.offsetHeight + 'px';
-        
-        canvas.parentNode.replaceChild(fallback, canvas);
-    });
+    // Only hide canvases that haven't been initialized, don't replace them
+    const heroCanvas = document.getElementById('hero-canvas');
+    const contactCanvas = document.getElementById('contact-canvas');
+    
+    if (heroCanvas && !heroScene) {
+        heroCanvas.style.display = 'none';
+    }
+    
+    if (contactCanvas && !contactScene) {
+        contactCanvas.style.display = 'none';
+    }
+    
+    // Log that we're using fallback (don't show intrusive message)
+    console.log('3D features disabled - browser does not support WebGL or initialization failed');
 }
 
 // Add initialization call to the preload function
@@ -393,16 +405,18 @@ function createPremiumBead(config, index) {
     });
     
     const bead = new THREE.Mesh(beadGeometry, beadMaterial);
-    bead.position.copy(config.position);
+    bead.position.set(config.position.x, config.position.y, config.position.z);
     bead.castShadow = true;
     bead.receiveShadow = true;
     
-    // Animation data
+    // Animation data - create proper Vector3 for original position
+    const originalPosition = new THREE.Vector3(config.position.x, config.position.y, config.position.z);
+    
     bead.userData = {
         rotationSpeed: config.speed.rotation,
         floatSpeed: config.speed.float,
         floatOffset: index * 1.2,
-        originalPosition: config.position.clone(),
+        originalPosition: originalPosition,
         parallaxIntensity: 0.3 + Math.random() * 0.4,
         scale: config.scale
     };
