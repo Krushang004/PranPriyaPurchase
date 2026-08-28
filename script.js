@@ -324,37 +324,28 @@ function initHeroScene() {
     pointLight2.position.set(8, -5, 2);
     heroScene.add(pointLight2);
     
-    // Create premium paper-grain beads (reduced count, intentional placement)
+    // Create premium paper-grain beads (rose family only - max 2-3 beads)
     const beadConfigs = [
         { 
-            position: { x: -6, y: 4, z: -3 }, 
-            scale: 1.8, 
-            color: 0xE5B646,
-            speed: { rotation: 0.003, float: 0.001 }
+            position: { x: -5, y: 3, z: -4 }, 
+            scale: 2.5, 
+            color: 0xE75964, // Rose
+            opacity: 0.25,
+            speed: { rotation: 0.002, float: 0.0008 }
         },
         { 
-            position: { x: 8, y: -2, z: -5 }, 
+            position: { x: 6, y: -3, z: -6 }, 
+            scale: 3.0, 
+            color: 0xFBE4E2, // Blush
+            opacity: 0.3,
+            speed: { rotation: 0.0015, float: 0.001 }
+        },
+        { 
+            position: { x: 0, y: 0, z: -8 }, 
             scale: 2.2, 
-            color: 0xE75964,
-            speed: { rotation: 0.002, float: 0.0015 }
-        },
-        { 
-            position: { x: -3, y: -6, z: -2 }, 
-            scale: 1.6, 
-            color: 0xFA863E,
+            color: 0xE75964, // Rose
+            opacity: 0.2,
             speed: { rotation: 0.0025, float: 0.0012 }
-        },
-        { 
-            position: { x: 5, y: 6, z: -4 }, 
-            scale: 2.0, 
-            color: 0x63AAB8,
-            speed: { rotation: 0.002, float: 0.0018 }
-        },
-        { 
-            position: { x: 0, y: 0, z: -6 }, 
-            scale: 1.4, 
-            color: 0x784563,
-            speed: { rotation: 0.0035, float: 0.001 }
         }
     ];
     
@@ -398,10 +389,10 @@ function createPremiumBead(config, index) {
     
     const beadMaterial = new THREE.MeshPhongMaterial({ 
         map: texture,
-        shininess: 30,
-        specular: 0x333333,
+        shininess: 20,
+        specular: 0x222222,
         transparent: true,
-        opacity: 0.9
+        opacity: config.opacity || 0.3
     });
     
     const bead = new THREE.Mesh(beadGeometry, beadMaterial);
