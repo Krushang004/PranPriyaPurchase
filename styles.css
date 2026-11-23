@@ -1,20 +1,18 @@
-/* CSS Variables for Premium Color Palette - Rose Family */
+/* CSS Variables for Premium Color Palette - Turquoise Zebra Brand */
 :root {
-    /* Cohesive Rose Family Palette */
-    --color-ivory: #FFF6F1;          /* Base background start */
-    --color-blush: #FBE4E2;          /* Base background end */
-    --color-rose: #E75964;           /* Primary - CTAs, links, accents */
-    --color-wine: #6B3A4D;           /* Deep text - body, nav, headlines */
-    --color-gold: #E5B646;           /* Sparingly - sparkle, hairline, glow only */
+    /* New Turquoise/Aqua Primary Palette */
+    --color-turquoise-light: #C4F4F3;    /* Light aqua background */
+    --color-turquoise: #A0E7E5;          /* Primary turquoise - main brand color */
+    --color-turquoise-dark: #7BCCC8;     /* Darker turquoise for depth */
+    --color-black: #0A0A0A;              /* Pure black for text & accents */
+    --color-white: #FFFFFF;              /* White for contrast */
+    --color-gray: #3A3A3A;               /* Medium gray for secondary text */
+    --color-gray-light: #F5F5F5;         /* Light gray backgrounds */
+    --color-teal-accent: #5BC0BE;        /* Accent teal for highlights */
     
-    /* Neutral System */
-    --color-white: #FFFFFF;
-    --color-gray: #8B7B7B;
-    --color-gray-light: #F8F2F0;
-    
-    /* Editorial Typography */
-    --font-serif: 'Fraunces', serif;
-    --font-sans: 'Outfit', sans-serif;
+    /* Bold Modern Typography */
+    --font-display: 'Playfair Display', serif;  /* For dramatic headlines */
+    --font-sans: 'Inter', sans-serif;           /* Clean body text */
     
     /* Premium Spacing */
     --section-padding: 140px 0;
